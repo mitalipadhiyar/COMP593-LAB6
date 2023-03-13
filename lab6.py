@@ -25,9 +25,12 @@ def get_expected_sha256():
 
     if resp_msg.status_code == requests.codes.ok:
        file_content = resp_msg.text 
-       VLC_content = re.split('\s\*\w*\W\d\W\d\W\d*\W\d\W\w*\W\w*',file_content)
+       VLC_content = re.split('\s\*\w*\W\d\W\d\W\d*\W\d\W\w*\W\w*',file_content)[0]
+       VLC_content = VLC_content.strip()
 
-    print(VLC_content)
+       print(VLC_content)
+       return VLC_content
+
 
 def download_installer():
 
@@ -36,39 +39,32 @@ def download_installer():
 
     if resp_msg.status_code == requests.codes.ok:
        Vlc_installer_file = resp_msg.text 
-    return
+       return resp_msg.content
     
 def installer_ok(installer_data, expected_sha256):
 
-    installer_data = 'http://download.videolan.org/pub/videolan/vlc/3.0.17.4/win64/vlc-3.0.17.4-win64.exe'
-    resp_msg = requests.get(installer_data)
+    cal_file_hash = hashlib.sha256(installer_data).hexdigest()
+    
+    if  cal_file_hash == expected_sha256:
 
-    if resp_msg.status_code == requests.codes.ok:
-        file_content = resp_msg.content
-
-        cal_file_hash = hashlib.sha256(file_content).hexdigest()
-
-        cal_file_hash == expected_sha256
-
-    print(cal_file_hash)
+        print(cal_file_hash)
+        return True
 
 def save_installer(installer_data):
-    installer_data = 'http://download.videolan.org/pub/videolan/vlc/3.0.17.4/win64/vlc-3.0.17.4-win64.exe'
-    resp_msg = requests.get(installer_data)
-
-    if resp_msg.status_code == requests.codes.ok:
-        file_content = resp_msg.content
-    with open(r'C:\\Users\bhara\Downloads\\vlc-3.0.17.4-win64.exe', 'wb') as file:
-           file.write(file_content)
+    
+    file_path =os.getenv('TEMP')
+    path = os.path.join(file_path, "vlc.exe")
+    with open(path, 'wb') as file:
+        file.write(installer_data)
+    return path
+    
 
 def run_installer(installer_path):
-    
-    installer_path = r'C:\Users\bhara\Downloads\vlc-3.0.17.4-win64.exe'
+
     subprocess.run([installer_path, '/L=1033', '/S'])
     
 
 def delete_installer(installer_path):
-    installer_path = r'C:\Users\bhara\Downloads\vlc-3.0.17.4-win64.exe'
     os.remove(installer_path)
 
 
