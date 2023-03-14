@@ -60,13 +60,17 @@ def save_installer(installer_data):
     
 
 def run_installer(installer_path):
-
+    file_path =os.getenv('TEMP')
+    installer_path = os.path.join(file_path, "vlc.exe")
     subprocess.run([installer_path, '/L=1033', '/S'])
+    return 
     
 
 def delete_installer(installer_path):
-    os.remove(installer_path)
+    file_path =os.getenv('TEMP')
+    installer_path = os.path.join(file_path, "vlc.exe")
 
+    os.remove(installer_path)
 
 
 
